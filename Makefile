@@ -11,6 +11,8 @@ REGISTERS_TEX += trace_registers.tex
 REGISTERS_TEX += sample_registers.tex
 REGISTERS_TEX += abstract_commands.tex
 
+REGISTERS_CHISEL += dm1_registers.scala
+
 FIGURES = *.eps
 
 riscv-debug-spec.pdf: $(NAME).tex $(REGISTERS_TEX) debug_rom.S $(FIGURES) vc.tex changelog.tex
@@ -41,6 +43,10 @@ changelog.tex: .git/logs/HEAD Makefile
 %.tex: %.xml registers.py
 	./registers.py --custom --definitions $@.inc --cheader $(basename $@).h $< > $@
 
+
+%.scala: %.xml registers.py
+	./registers.py --chisel $(basename $@).scala $< > /dev/null
+
 %.o:	%.S
 	$(CC) -c $<
 
@@ -59,6 +65,8 @@ hello:	hello.c
 
 hello.s:	hello.c
 	$(CC) -o $@ $^ -S -Os
+
+chisel: $(REGISTERS_CHISEL)
 
 clean:
 	rm -f $(NAME).pdf $(NAME).aux $(NAME).toc $(NAME).log $(REGISTERS_TEX) \
